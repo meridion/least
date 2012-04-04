@@ -113,23 +113,11 @@ static int page_to_texture(fz_context *context, fz_document *doc, int pagenum) {
     fz_clear_pixmap_with_value(context, image, 255);
     fz_run_page(doc, page, dev, ctm, NULL);
 
-/*
-    fz_write_png(context, image, "hoi.png", 0);
-*/
-
     /* Draw onto pixmap here */
     pages[pagenum] = pixmap_to_texture((void*)fz_pixmap_samples(context, image),
             fz_pixmap_width(context, image),
             fz_pixmap_height(context, image), 0, 0);
 
-    /*
-    s = malloc(sizeof(char) * 20);
-    sprintf(s, "/tmp/test%d.png", i);
-
-    printf("Saving page %d to %s\n", i, s);
-    fz_write_png(context, image, s, 0);
-    free(s);
-    */
 
     fz_drop_pixmap(context, image);
 
@@ -354,11 +342,10 @@ int setup_sdl(void)
 {
 	/* Information about the current video settings. */
 	const SDL_VideoInfo *info = NULL;
-	/* Dimensions of our window. */
-	int width = 0;
-	int height = 0;
+
 	/* Color depth in bits of our window. */
 	int bpp = 0;
+
 	/* Flags we will pass into SDL_SetVideoMode. */
     int flags = 0;
 
@@ -386,17 +373,6 @@ int setup_sdl(void)
     gl_h = h = info->current_h;
     printf("W, H: (%f, %f)\n", w, h);
 
-	/*
-	 * Set our width/height to 640/480 (you would
-	 * of course let the user decide this in a normal
-	 * app). We get the bpp we will request from
-	 * the display. On X11, VidMode can't change
-	 * resolution, so this is probably being overly
-	 * safe. Under Win32, ChangeDisplaySettings
-	 * can change the bpp.
-	 */
-	width = (int)w;
-	height = (int)h;
 	bpp = info->vfmt->BitsPerPixel;
 
 	/*
@@ -424,7 +400,7 @@ int setup_sdl(void)
 	/* flags = SDL_OPENGL | SDL_FULLSCREEN; */
 	flags = SDL_OPENGL | SDL_RESIZABLE | SDL_DOUBLEBUF;
 	/* flags = SDL_OPENGL; */
-    surface = SDL_SetVideoMode(width, height, bpp, flags);
+    surface = SDL_SetVideoMode(w, h, bpp, flags);
 	if (!surface) {
 		/*
 		 * This could happen for a variety of reasons,
@@ -436,7 +412,7 @@ int setup_sdl(void)
 	}
 
 
-    SDL_WM_SetCaption("least", "icon");
+    SDL_WM_SetCaption("least", "least");
 
 	return 0;
 }
@@ -624,10 +600,6 @@ int main (int argc, char **argv) {
 
         while (1) {
             /* Process incoming events. */
-            /*
-             * XXX: Poll is now wait.
-             */
-            /* usleep(10000); */
             process_events();
 
             if (redraw) {
